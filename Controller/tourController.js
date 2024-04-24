@@ -1,30 +1,5 @@
 const fs = require('fs');
-
-
-const details = JSON.parse(fs.readFileSync(`${__dirname}/../data/tours-simple.json` ));
-
-const checkID = (req,res,next,val)=>{
-    const id = req.params.id*1;
-    console.log(`The requested id is: ${val}`)
-    if(id > details.length){
-        res.status(404).send({
-            status: "error",
-            message: "Data out of bound "
-        });
-
-    }
-    next();
-}
-
-const checkBody = (req,res,next)=>{
-    if(!req.body.name || !req.body.price){
-        return res.status(404).send({
-            status: "Data",
-            message: err.message
-        });
-    }
-    next();
-}
+const Tour = require('./../Model/tourModel');
 
 const addTour = (req, res) => {
     const newID = details[details.length - 1].id + 1;
@@ -47,6 +22,21 @@ const addTour = (req, res) => {
     }
 }
 
+const createTour = async (req, res) => {
+    try {
+        const newTour = await Tour.create(req.body)
+
+        res.status(201).json({
+            status: 'success',
+            data: {
+                tour: newTour
+            }
+        });
+    } catch (err) {
+        // Log an error message or handle it accordingly
+        console.error("An error occurred:", err.message);
+    }
+}
 
 // exports.createTour = (req, res) => {
 //     // console.log(req.body);
@@ -75,9 +65,9 @@ const addTour = (req, res) => {
 const getALLTours = (req,res) => {
     res.status(200).json({
         status: "success",
-        createdTime: req.requestTime,
-        no_of_tours: details.length,
-        data: details
+         createdTime: req.requestTime 
+        // no_of_tours: details.length,
+        // data: details
     });
 }
 
@@ -85,21 +75,22 @@ const searchTour = (req, res) => {
     console.log(req.params);
     const id = req.params.id * 1;
 
-    const detail = details.find(el => el.id === id);
+    //const detail = details.find(el => el.id === id);
     // if (!detail) {
     //     res.status(404).send({
     //         status: "error",
     //         message: "Data not found"
     //     });
     // } else {
-        res.status(200).send({
-            status: "success finding the data",
-            data: {
-                detail: detail
-            }
-        });
+        // res.status(200).send({
+        //     status: "success finding the data",
+        //     data: {
+        //         detail: detail
+        //     }
+        // });
    // }
 }
+
 
 const deleteTour = (req, res) => {
     if (req.params.id * 1 > details.length) {
@@ -128,6 +119,7 @@ const updateTour = (req, res) => {
 module.exports = {
     getALLTours,
     searchTour,
+    createTour,
     deleteTour,
     addTour,
     updateTour,

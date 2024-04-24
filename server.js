@@ -1,6 +1,7 @@
 const express =  require('express');
 const app = express();
-const logger = require('morgan')
+const mongoose= require('mongoose');
+const logger = require('morgan');
 const tourRouter=require('./Router/tourRouter');
 const userRouter = require('./Router/userRouter');
 const dotenv = require('dotenv')
@@ -9,10 +10,11 @@ app.use(logger('dev'));
 
 
 
+
 dotenv.config({path:'./.env'});
 if(process.env.NODE_ENV ==='development')
 {
-    app.use(morgan('dev'));
+    app.use(logger('dev'));
 }
 //optional methods
 // app.get('/api/v1/details',getALLTours);
@@ -21,9 +23,34 @@ if(process.env.NODE_ENV ==='development')
 // app.post('/api/v1/create', addTour );
 // app.get('/api/v1/details/:id', searchTour);
  
+const DB_STRING = process.env.DATABASE_STRING;
+
+mongoose.connect(DB_STRING, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+}).then(() => {
+  console.log("DB connection was successful");
+}).catch((err) => {
+  console.error("Error connecting to MongoDB:", err);
+});
 
 
+const  testTour =new   tour({
+    name:'Ravi kumar',
+    rating:4,
+    duration:5,
+    maxGroupSize:10,
+    difficulty: 'medium',
+    ratingsAverage: 4.2,
+    price: 4500
 
+})
+testTour
+.save()
+.then(val => console.log(val))
+.catch(err=>{
+    console.log("Error: ",err.message)
+});
 //MIDDLEWARE 
 
 app.use((req,res,next)=>{
@@ -43,7 +70,8 @@ app.use('/api/v1/details', tourRouter)
 
 
 const port = process.env.PORT || 5050;
-app.listen(PORT,()=>{
+
+app.listen(port,()=>{
     console.log('Your app is running on the port http://localhost:5000')
 });
 

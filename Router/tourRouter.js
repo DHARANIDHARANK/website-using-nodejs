@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const tourController = require('../Controller/tourController');
 
-router.param('id', tourController.checkID);
+// router.param('id', tourController.checkID);
 
 // Route for creating a new tour
 
@@ -14,9 +14,10 @@ router.route('/:id')
 
 router.route('/')
     .get(tourController.getALLTours)
+    .post( tourController.createTour);
 
 router.route('/create')
-    .post(tourController.checkBody, tourController.addTour);
+    .post( tourController.addTour);
 
 
 module.exports = router;
